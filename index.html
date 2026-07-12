@@ -449,7 +449,7 @@
 <body>
 
     <audio id="bg-music" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        <source src="song.mp3" type="audio/mpeg">
     </audio>
 
     <div id="welcome-screen">
@@ -466,7 +466,7 @@
     <div class="content-container" id="main-content">
         <div class="english-title">Happy Birthday Hanaa</div>
         
-        <h1>كل عام وأنتِ بخير يا حبيبتي! ❤️</h1>
+        <h1>كل عام وأنتِ بخير يا أميرتي! ❤️</h1>
         
         <div class="flat-vector-cake-container">
             <div class="candles-row">
@@ -497,7 +497,7 @@
         </div>
         
         <p class="message">
-            إلى زوجتي الغالية وشريكة عمري "Hanaa"، في هذا اليوم السعيد أريد أن أقول لكِ كل عام وأنتِ تنبضين داخل قلبي. شكراً لأنكِ تجعلين كل يوم في حياتي أجمل. أتمنى لكِ عاماً مليئاً بالسعادة والنجاح، وأن نبقى معاً دائماً وأبطالاً في قصتنا الجميلة يا أميرتي.
+            إلى زوجتي الغالية وشريكة عمري "Hanaa"  في هذا اليوم السعيد أريد أن أقول لكِ كل عام وأنتِ تنبضين داخل قلبي. شكراً لأنكِ تجعلين كل يوم في حياتي أجمل. أتمنى لكِ عاماً مليئاً بالسعادة والنجاح، وأن نبقى معاً دائماً وأبداً يا أميرتي الجميلة 
         </p>
 
         <div class="countdown-bottom">
@@ -551,9 +551,9 @@
                         <path d="M290,185 C275,165 260,190 290,207 C320,190 305,165 290,185 Z" class="tree-heart-shape" />
                         <text x="290" y="193" class="tree-heart-text">أم أولادي</text>
                     </g>
-                    <g class="tree-heart-node" onclick="handleHeartClick(this, 75, 245, 'وتيني')">
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 75, 245, 'ابنتي')">
                         <path d="M75,245 C60,225 45,250 75,267 C105,250 90,225 75,245 Z" class="tree-heart-shape" />
-                        <text x="75" y="253" class="tree-heart-text">وتيني</text>
+                        <text x="75" y="253" class="tree-heart-text">ابنتي</text>
                     </g>
                     <g class="tree-heart-node" onclick="handleHeartClick(this, 325, 245, 'نبضي')">
                         <path d="M325,245 C310,225 295,250 325,267 C355,250 340,225 325,245 Z" class="tree-heart-shape" />
@@ -591,7 +591,7 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        const letters = "HAPPYBIRTHDAYMYLITTLEPRINCESS💖";
+        const letters = "HAPPYBIRTHDAYMYPRINCESS";
         const alphabet = letters.split("");
         const fontSize = 20; 
         let columns = canvas.width / fontSize;
@@ -681,7 +681,7 @@
             });
         }
 
-        const timeline = ["3", "2", "1", "عيد", "ميلاد", "سعيد", "يا", "Hanaa"];
+        const timeline = ["3", "2", "1", "عيد", "ميلاد", "سعيد","أميرتي"];
         let timelineIndex = 0;
 
         function startSurprise() {
@@ -691,7 +691,7 @@
                 document.getElementById('bg-music').play().catch(e => console.log(e));
                 
                 canvas.style.display = 'block';
-                setInterval(drawMatrix, 35);
+                setInterval(drawMatrix, 60);
                 
                 const overlay = document.getElementById('digital-overlay');
                 const changingText = document.getElementById('changing-text');
