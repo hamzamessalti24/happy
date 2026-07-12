@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عيد ميلاد سعيد يا أميرتي</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700;900&family=Great+Vibes&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #0b0106; 
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            position: relative;
+        }
+
+        /* خلفية الماتريكس الرقمية الوردية */
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            display: none;
+        }
+
+        /* شاشة البداية */
+        #welcome-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0b0106;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            padding: 20px;
+            transition: opacity 0.6s ease;
+        }
+
+        #welcome-screen h2 {
+            color: #ffffff;
+            font-size: 1.4rem;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px #ff3366, 0 0 30px #ff3366;
+        }
+
+        .gift-btn {
+            font-size: 5rem;
+            background: none;
+            border: none;
+            cursor: pointer;
+            animation: bounce 2s infinite;
+            filter: drop-shadow(0 0 20px #ff3366);
+            transition: transform 0.2s;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-15px); }
+            60% { transform: translateY(-7px); }
+        }
+
+        /* العداد التنازلي الافتتاحي */
+        #digital-overlay {
+            position: fixed;
+            z-index: 5;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .glow-text {
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: #ff3366;
+            text-shadow: 0 0 15px #ff3366, 0 0 30px #ff3366;
+            animation: textPulse 1.1s infinite alternate;
+        }
+
+        @keyframes textPulse {
+            0% { transform: scale(0.95); }
+            100% { transform: scale(1.05); }
+        }
+
+        /* حاوية المحتوى الرئيسي المتمركبة في المنتصف تماماً */
+        .content-container {
+            text-align: center;
+            max-width: 480px;
+            width: 100%;
+            display: none; 
+            position: relative;
+            z-index: 10;
+            padding: 25px 15px;
+            margin: 0 auto;
+            animation: fadeIn 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .english-title {
+            font-family: 'Great Vibes', cursive;
+            color: #ff3366;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            direction: ltr;
+            text-shadow: 0 0 15px rgba(255, 51, 102, 0.8);
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-shadow: 0 0 12px #ff3366;
+        }
+
+        /* الكعكة المسطحة */
+        .flat-vector-cake-container {
+            width: 200px;
+            height: 220px;
+            margin: 30px auto 20px auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .candles-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: -4px;
+            z-index: 4;
+        }
+
+        .single-candle {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .candle-flame {
+            width: 10px;
+            height: 18px;
+            background: radial-gradient(ellipse at bottom, #ff9e00 0%, #ff3300 100%);
+            border-radius: 50% 50% 20% 20% / 60% 60% 40% 40%;
+            box-shadow: 0 0 10px #ff9e00, 0 0 18px #ff3300;
+            animation: flameFlicker 0.6s ease-in-out infinite alternate;
+        }
+
+        .candle-number-body {
+            font-size: 3.8rem;
+            font-weight: 900;
+            color: #f7b731;
+            line-height: 1;
+            font-family: monospace;
+            -webkit-text-stroke: 2px #3d2419;
+            filter: drop-shadow(0 0 8px rgba(247, 183, 49, 0.6));
+            margin-top: -3px;
+        }
+
+        @keyframes flameFlicker {
+            0% { transform: scale(0.95) rotate(-2deg); }
+            100% { transform: scale(1.05) rotate(2deg); }
+        }
+
+        .cake-main-body {
+            width: 180px;
+            height: 75px;
+            background-color: #84523f;
+            border: 3px solid #3d2419;
+            border-radius: 18px 18px 12px 12px;
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+
+        .cake-white-frosting {
+            width: 100%;
+            height: 32px;
+            background-color: #ffffff;
+            border-bottom: 3px solid #3d2419;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .cream-drops {
+            display: flex;
+            position: absolute;
+            bottom: -11px;
+            left: -2px;
+            width: calc(100% + 4px);
+        }
+
+        .cream-drop-curve {
+            flex: 1;
+            height: 16px;
+            background-color: #ffffff;
+            border-bottom: 3px solid #3d2419;
+            border-left: 3px solid #3d2419;
+            border-right: 3px solid #3d2419;
+            border-radius: 0 0 50% 50% / 0 0 100% 100%;
+            margin-left: -3px;
+        }
+
+        .cake-middle-layer {
+            width: 100%;
+            height: 10px;
+            background-color: #ffffff;
+            border-top: 3px solid #3d2419;
+            border-bottom: 3px solid #3d2419;
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+        }
+
+        .cake-bottom-plate {
+            width: 210px;
+            height: 12px;
+            background-color: #a3725e;
+            border: 3px solid #3d2419;
+            border-radius: 8px;
+            z-index: 1;
+            margin-top: -3px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        p.message {
+            color: #ffe5ec;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+            margin-bottom: 30px;
+        }
+
+        /* العداد السفلي */
+        .countdown-bottom {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            max-width: 340px;
+            margin: 25px auto 35px auto;
+            background: rgba(11, 1, 6, 0.85);
+            padding: 12px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 51, 102, 0.4);
+            box-shadow: 0 0 15px rgba(255, 51, 102, 0.25);
+        }
+
+        .countdown-box {
+            background: rgba(255, 51, 102, 0.12);
+            padding: 10px 2px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .countdown-time {
+            font-size: 1.35rem;
+            font-weight: 900;
+            color: #ff3366;
+            text-shadow: 0 0 6px #ff3366;
+        }
+
+        .countdown-label {
+            font-size: 0.75rem;
+            color: #ffe5ec;
+            margin-top: 3px;
+        }
+
+        /* قلب اللغات العالمي */
+        .love-heart-languages {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            margin: 20px auto 10px auto;
+        }
+
+        .love-heart-languages h3 {
+            color: #fff;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px #ff3366;
+        }
+
+        .heart-shape-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .word-love {
+            position: absolute;
+            font-weight: bold;
+            color: #ff4d6d;
+            text-shadow: 0 0 8px rgba(255, 77, 109, 0.85);
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .word-love:hover {
+            color: #ffffff;
+            text-shadow: 0 0 15px #ff3366, 0 0 25px #ff0055;
+            transform: translate(-50%, -50%) scale(1.2);
+            z-index: 20;
+        }
+
+        .word-main-arabic {
+            color: #ffffff !important;
+            font-size: 2.2rem !important;
+            font-weight: 900;
+            text-shadow: 0 0 15px #ff3366, 0 0 30px #ff0055 !important;
+            z-index: 10;
+        }
+
+        /* قسم الشجرة المضيئة المحدث والمتمركز بالمنتصف */
+        .love-tree-section {
+            margin: 30px auto 10px auto;
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tree-svg-container {
+            width: 100%;
+            height: 420px;
+            display: block;
+            margin: 0 auto;
+            overflow: visible;
+        }
+
+        .tree-branch {
+            stroke: #ff3366;
+            stroke-width: 3.5;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 6px #ff3366);
+            fill: none;
+        }
+
+        .tree-trunk {
+            stroke: #ff1a53;
+            stroke-width: 7;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 10px #ff0044);
+            fill: none;
+        }
+
+        /* حاوية الأوراق (القلوب) التفاعلية مع أنيميشن النبض الصحيح */
+        .tree-heart-node {
+            cursor: pointer;
+            pointer-events: auto;
+            transform-origin: 0px 0px; /* سيتم ضبط المركز ديناميكياً لتجنب الاختفاء */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* أنيميشن نبض سريع جداً عند اللمس أو الضغط دون اختفاء */
+        .tree-heart-node.clicked-pulse {
+            animation: nodePulseEffect 0.4s ease-out;
+        }
+
+        @keyframes nodePulseEffect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        .tree-heart-shape {
+            fill: rgba(255, 51, 102, 0.25);
+            stroke: #ff4d6d;
+            stroke-width: 1.5;
+            filter: drop-shadow(0 0 5px #ff4d6d);
+            transition: fill 0.3s, stroke 0.3s, filter 0.3s;
+        }
+
+        .tree-heart-node:hover .tree-heart-shape {
+            fill: #ffffff;
+            stroke: #ff0055;
+            filter: drop-shadow(0 0 12px #ff0055);
+        }
+
+        .tree-heart-text {
+            font-family: 'Cairo', sans-serif;
+            font-weight: 700;
+            font-size: 11px;
+            fill: #ffe5ec;
+            text-anchor: middle;
+            dominant-baseline: central;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
+            pointer-events: none;
+        }
+
+        .tree-heart-node:hover .tree-heart-text {
+            fill: #ba133b;
+            font-weight: 900;
+            text-shadow: none;
+        }
+
+        /* القلوب الصغيرة المنبثقة من الضغط */
+        .falling-heart {
+            position: absolute;
+            color: #ff3366;
+            font-size: 1.2rem;
+            pointer-events: none;
+            z-index: 50;
+            animation: burstExplosion 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes burstExplosion {
+            0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.2) rotate(var(--rot)); opacity: 0; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="welcome-screen">
+        <h2>مرحباً يا أميرتي، هناك مفاجأة بانتظاركِ... افتحي الهدية 💖</h2>
+        <button class="gift-btn" onclick="startSurprise()">🎁</button>
+    </div>
+
+    <canvas id="matrix-canvas"></canvas>
+
+    <div id="digital-overlay">
+        <div class="glow-text" id="changing-text">3</div>
+    </div>
+
+    <div class="content-container" id="main-content">
+        <div class="english-title">Happy Birthday Hanaa</div>
+        
+        <h1>كل عام وأنتِ بخير يا حبيبتي! ❤️</h1>
+        
+        <div class="flat-vector-cake-container">
+            <div class="candles-row">
+                <div class="single-candle">
+                    <div class="candle-flame"></div>
+                    <div class="candle-number-body">2</div>
+                </div>
+                <div class="single-candle">
+                    <div class="candle-flame"></div>
+                    <div class="candle-number-body">2</div>
+                </div>
+            </div>
+            <div class="cake-main-body">
+                <div class="cake-white-frosting">
+                    <div class="cream-drops">
+                        <div class="cream-drop-curve"></div>
+                        <div class="cream-drop-curve"></div>
+                        <div class="cream-drop-curve"></div>
+                        <div class="cream-drop-curve"></div>
+                        <div class="cream-drop-curve"></div>
+                        <div class="cream-drop-curve"></div>
+                        <div class="cream-drop-curve"></div>
+                    </div>
+                </div>
+                <div class="cake-middle-layer"></div>
+            </div>
+            <div class="cake-bottom-plate"></div>
+        </div>
+        
+        <p class="message">
+            إلى زوجتي الغالية وشريكة عمري "Hanaa"، في هذا اليوم السعيد أريد أن أقول لكِ كل عام وأنتِ تنبضين داخل قلبي. شكراً لأنكِ تجعلين كل يوم في حياتي أجمل. أتمنى لكِ عاماً مليئاً بالسعادة والنجاح، وأن نبقى معاً دائماً وأبطالاً في قصتنا الجميلة يا أميرتي.
+        </p>
+
+        <div class="countdown-bottom">
+            <div class="countdown-box">
+                <div class="countdown-time" id="days">00</div>
+                <div class="countdown-label">أيام</div>
+            </div>
+            <div class="countdown-box">
+                <div class="countdown-time" id="hours">00</div>
+                <div class="countdown-label">ساعات</div>
+            </div>
+            <div class="countdown-box">
+                <div class="countdown-time" id="minutes">00</div>
+                <div class="countdown-label">دقائق</div>
+            </div>
+            <div class="countdown-box">
+                <div class="countdown-time" id="seconds">00</div>
+                <div class="countdown-label">ثواني</div>
+            </div>
+        </div>
+
+        <div class="love-heart-languages">
+            <h3>أحبكِ بكل لغات العالم 💖</h3>
+            <div class="heart-shape-container" id="heart-words-box"></div>
+        </div>
+
+        <!-- قسم الشجرة الكونية المحدث والمضبوط للتمركز المطلق -->
+        <div class="love-tree-section" id="tree-main-zone">
+            <div class="tree-svg-container">
+                <svg viewBox="0 0 400 420" width="100%" height="100%">
+                    <!-- الجذع والفروع المستقرة هيدروليكياً -->
+                    <path d="M 200,400 Q 200,320 200,280" class="tree-trunk" />
+                    <path d="M 200,280 Q 150,230 110,200" class="tree-branch" />
+                    <path d="M 200,280 Q 250,230 290,200" class="tree-branch" />
+                    <path d="M 200,300 Q 130,270 80,260" class="tree-branch" />
+                    <path d="M 200,300 Q 270,270 320,260" class="tree-branch" />
+                    <path d="M 150,235 Q 160,160 140,110" class="tree-branch" />
+                    <path d="M 250,235 Q 240,160 260,110" class="tree-branch" />
+                    <path d="M 200,280 Q 200,180 200,140" class="tree-branch" />
+
+                    <!-- أوراق الحب (القلوب) الموزعة هندسياً مع الكلمات الرومانسية المضافة من عندك -->
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 200, 120, 'أميرتي')">
+                        <path d="M200,120 C185,100 170,125 200,142 C230,125 215,100 200,120 Z" class="tree-heart-shape" />
+                        <text x="200" y="128" class="tree-heart-text">أميرتي</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 110, 185, 'زوجتي')">
+                        <path d="M110,185 C95,165 80,190 110,207 C140,190 125,165 110,185 Z" class="tree-heart-shape" />
+                        <text x="110" y="193" class="tree-heart-text">زوجتي</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 290, 185, 'أم أولادي')">
+                        <path d="M290,185 C275,165 260,190 290,207 C320,190 305,165 290,185 Z" class="tree-heart-shape" />
+                        <text x="290" y="193" class="tree-heart-text">أم أولادي</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 75, 245, 'وتيني')">
+                        <path d="M75,245 C60,225 45,250 75,267 C105,250 90,225 75,245 Z" class="tree-heart-shape" />
+                        <text x="75" y="253" class="tree-heart-text">وتيني</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 325, 245, 'نبضي')">
+                        <path d="M325,245 C310,225 295,250 325,267 C355,250 340,225 325,245 Z" class="tree-heart-shape" />
+                        <text x="325" y="253" class="tree-heart-text">نبضي</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 135, 100, 'عشقي')">
+                        <path d="M135,100 C120,80 105,105 135,122 C165,105 150,80 135,100 Z" class="tree-heart-shape" />
+                        <text x="135" y="108" class="tree-heart-text">عشقي</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 265, 100, 'ملاكي')">
+                        <path d="M265,100 C250,80 235,105 265,122 C295,105 280,80 265,100 Z" class="tree-heart-shape" />
+                        <text x="265" y="108" class="tree-heart-text">ملاكي</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 200, 210, 'نصفي الآخر')">
+                        <path d="M200,210 C185,190 170,215 200,232 C230,215 215,190 200,210 Z" class="tree-heart-shape" />
+                        <text x="200" y="218" class="tree-heart-text">نصفي الآخر</text>
+                    </g>
+                    <g class="tree-heart-node" onclick="handleHeartClick(this, 200, 290, 'روحي')">
+                        <path d="M200,290 C185,270 170,295 200,312 C230,295 215,270 200,290 Z" class="tree-heart-shape" />
+                        <text x="200" y="298" class="tree-heart-text">روحي</text>
+                    </g>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('matrix-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const letters = "HAPPYBIRTHDAYMYLITTLEPRINCESS💖";
+        const alphabet = letters.split("");
+        const fontSize = 20; 
+        let columns = canvas.width / fontSize;
+        let rainDrops = [];
+
+        for (let x = 0; x < columns; x++) {
+            rainDrops[x] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(11, 1, 6, 0.12)'; 
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff2a5f'; 
+            ctx.font = 'bold ' + fontSize + 'px monospace';
+
+            for (let i = 0; i < rainDrops.length; i++) {
+                const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+                ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    rainDrops[i] = 0;
+                }
+                rainDrops[i]++;
+            }
+        }
+
+        const loveLanguages = [
+            { text: "أحبك", lang: "ar", size: 32, isMain: true },
+            { text: "I Love You", lang: "en", size: 14 },
+            { text: "Je t'aime", lang: "fr", size: 13 },
+            { text: "Te amo", lang: "es", size: 13 },
+            { text: "Ich liebe dich", lang: "de", size: 12 },
+            { text: "Ti amo", lang: "it", size: 13 },
+            { text: "Eu te amo", lang: "pt", size: 12 },
+            { text: "Seni seviyorum", lang: "tr", size: 12 },
+            { text: "Я тебя люблю", lang: "ru", size: 11 },
+            { text: "Aishiteru", lang: "ja", size: 11 },
+            { text: "Saranghae", lang: "ko", size: 11 },
+            { text: "Wo ai ni", lang: "zh", size: 12 },
+            { text: "Mahal kita", lang: "tl", size: 10 },
+            { text: "Te bheahe", lang: "in", size: 10 },
+            { text: "Jeg elsker deg", lang: "no", size: 10 },
+            { text: "Miluji te", lang: "cs", size: 10 },
+            { text: "Ik hou van jou", lang: "nl", size: 11 },
+            { text: "Jag älskar dig", lang: "sv", size: 10 },
+            { text: "Volim te", lang: "hr", size: 11 },
+            { text: "Te iubesc", lang: "ro", size: 12 },
+            { text: "Kocham cię", lang: "pl", size: 11 },
+            { text: "Σ' αγαπώ", lang: "el", size: 11 },
+            { text: "Szeretlek", lang: "hu", size: 10 },
+            { text: "نموت عليك", lang: "dz", size: 14 }
+        ];
+
+        function generateHeartLayout() {
+            const container = document.getElementById('heart-words-box');
+            const totalWords = loveLanguages.length;
+
+            loveLanguages.forEach((item, index) => {
+                const wordDiv = document.createElement('div');
+                wordDiv.innerText = item.text;
+                wordDiv.className = 'word-love';
+                
+                let x, y;
+
+                if (item.isMain) {
+                    x = 50;
+                    y = 45;
+                    wordDiv.classList.add('word-main-arabic');
+                } else {
+                    const angle = (index / (totalWords - 1)) * 2 * Math.PI - Math.PI / 2;
+                    const heartX = 16 * Math.pow(Math.sin(angle), 3);
+                    const heartY = 13 * Math.cos(angle) - 5 * Math.cos(2*angle) - 2 * Math.cos(3*angle) - Math.cos(4*angle);
+                    
+                    x = 50 + (heartX * 2.2); 
+                    y = 45 - (heartY * 2.0); 
+                }
+
+                wordDiv.style.left = `${x}%`;
+                wordDiv.style.top = `${y}%`;
+                wordDiv.style.fontSize = `${item.size}px`;
+                
+                if(!item.isMain) {
+                    const colors = ['#ff4d6d', '#ff758f', '#ff85a1', '#f72585'];
+                    wordDiv.style.color = colors[index % colors.length];
+                }
+
+                container.appendChild(wordDiv);
+            });
+        }
+
+        const timeline = ["3", "2", "1", "عيد", "ميلاد", "سعيد", "يا", "Hanaa"];
+        let timelineIndex = 0;
+
+        function startSurprise() {
+            document.getElementById('welcome-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.display = 'none';
+                document.getElementById('bg-music').play().catch(e => console.log(e));
+                
+                canvas.style.display = 'block';
+                setInterval(drawMatrix, 35);
+                
+                const overlay = document.getElementById('digital-overlay');
+                const changingText = document.getElementById('changing-text');
+                overlay.style.display = 'flex';
+                
+                let textTimer = setInterval(() => {
+                    timelineIndex++;
+                    if (timelineIndex < timeline.length) {
+                        changingText.innerText = timeline[timelineIndex];
+                    } else {
+                        clearInterval(textTimer);
+                        overlay.style.display = 'none';
+                        revealFinalMessage();
+                    }
+                }, 1100);
+                
+            }, 600);
+        }
+
+        function revealFinalMessage() {
+            document.body.style.overflowY = 'auto'; 
+            document.getElementById('main-content').style.display = 'block';
+            
+            generateHeartLayout(); 
+            startBirthdayCountdown(); 
+
+            let duration = 5 * 1000;
+            let end = Date.now() + duration;
+
+            (function frame() {
+                confetti({ particleCount: 3, angle: 60, spread: 50, origin: { x: 0 }, colors: ['#ff3366', '#ff758f', '#ffb3c6', '#ffffff'] });
+                confetti({ particleCount: 3, angle: 120, spread: 50, origin: { x: 1 }, colors: ['#ff3366', '#ff758f', '#ffb3c6', '#ffffff'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
+        }
+
+        function startBirthdayCountdown() {
+            function updateCountdown() {
+                const now = new Date();
+                let currentYear = now.getFullYear();
+                let birthdayTarget = new Date(`July 16, ${currentYear} 00:00:00`);
+                
+                if (now > birthdayTarget) {
+                    birthdayTarget = new Date(`July 16, ${currentYear + 1} 00:00:00`);
+                }
+                
+                const diff = birthdayTarget - now;
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('days').innerText = d < 10 ? '0' + d : d;
+                document.getElementById('hours').innerText = h < 10 ? '0' + h : h;
+                document.getElementById('minutes').innerText = m < 10 ? '0' + m : m;
+                document.getElementById('seconds').innerText = s < 10 ? '0' + s : s;
+            }
+            updateCountdown();
+            setInterval(updateCountdown, 1000);
+        }
+        
+        // معالجة الضغط الاحترافي لإطلاق القلوب دون اختفاء العنصر الأصلي
+        function handleHeartClick(element, cx, cy, word) {
+            // إضافة أنيميشن النبض السريع للقلب المضغوط
+            element.classList.add('clicked-pulse');
+            setTimeout(() => { element.classList.remove('clicked-pulse'); }, 400);
+
+            const zone = document.getElementById('tree-main-zone');
+            const zoneBound = zone.getBoundingClientRect();
+            const svgEl = element.ownerSVGElement;
+            const svgBound = svgEl.getBoundingClientRect();
+
+            // حساب دقيق لموقع الضغط داخل شاشة الهاتف الفسيحة
+            const scaleX = svgBound.width / 400;
+            const scaleY = svgBound.height / 420;
+
+            const x = (svgBound.left - zoneBound.left) + (cx * scaleX);
+            const y = (svgBound.top - zoneBound.top) + (cy * scaleY);
+
+            // إطلاق انفجار من 6 قلوب صغيرة متناثرة بزوايا متباعدة
+            for (let i = 0; i < 6; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'falling-heart';
+                heart.innerHTML = '💖';
+                
+                // تحديد قيم الانفجار الفيزيائي عبر الـ CSS Variables
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 40 + Math.random() * 50;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance - 30; // دفع طفيف للأعلى
+                const rot = Math.random() * 90 - 45;
+
+                heart.style.setProperty('--tx', `${tx}px`);
+                heart.style.setProperty('--ty', `${ty}px`);
+                heart.style.setProperty('--rot', `${rot}deg`);
+
+                heart.style.left = `${x}px`;
+                heart.style.top = `${y}px`;
+                
+                zone.appendChild(heart);
+
+                setTimeout(() => { heart.remove(); }, 800);
+            }
+
+            // مؤثر الخصائص الاحتفالية الكونية الإضافية لمزيد من الرومانسية
+            confetti({
+                particleCount: 8,
+                spread: 40,
+                origin: { x: svgBound.left / window.innerWidth + (cx/400)*(svgBound.width/window.innerWidth), y: svgBound.top / window.innerHeight + (cy/420)*(svgBound.height/window.innerHeight) },
+                colors: ['#ff3366', '#ffffff']
+            });
+        }
+    </script>
+</body>
+</html>
